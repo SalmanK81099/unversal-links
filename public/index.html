@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Get the App - Roblox-Style Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #00a2ff;
+        --secondary-color: #393b3d;
+        --accent-color: #f2f4f5;
+        --text-color: #1b1b1b;
+        --button-hover: #0089ff;
+        --shadow-color: rgba(25, 25, 25, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+          'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #f2f4f5 0%, #ffffff 100%);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      .page-wrapper {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px var(--shadow-color);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-color);
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--secondary-color);
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 2rem;
+      }
+
+      .store-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+      }
+
+      .store-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 32px;
+        background: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+        min-width: 200px;
+      }
+
+      .store-button:hover {
+        background: var(--button-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 162, 255, 0.2);
+      }
+
+      .store-button.android {
+        background: var(--secondary-color);
+      }
+
+      .store-button.android:hover {
+        background: #2d2f31;
+        box-shadow: 0 4px 12px rgba(57, 59, 61, 0.2);
+      }
+
+      .divider {
+        margin: 2rem 0;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #888;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e5e5e5;
+      }
+
+      .divider span {
+        padding: 0 1rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .qr-section {
+        background: var(--accent-color);
+        margin: 2rem -40px -40px;
+        padding: 2rem 40px;
+        border-top: 1px solid #e5e5e5;
+      }
+
+      .qr-section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--secondary-color);
+      }
+
+      .qr-code {
+        margin: 1.5rem 0;
+        padding: 20px;
+        background: white;
+        display: inline-block;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px var(--shadow-color);
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+        text-align: left;
+      }
+
+      .feature {
+        padding: 1rem;
+      }
+
+      .feature h3 {
+        color: var(--secondary-color);
+        margin-bottom: 0.5rem;
+      }
+
+      .feature p {
+        color: #666;
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 30px 20px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        .store-button {
+          width: 100%;
+        }
+
+        .qr-section {
+          margin: 2rem -20px -30px;
+          padding: 2rem 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="container">
+        <h1>Experience Anywhere</h1>
+        <p class="subtitle">
+          Download our app to unlock the full experience on your mobile device
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <h3>Seamless Experience</h3>
+            <p>Continue right where you left off on any device</p>
+          </div>
+          <div class="feature">
+            <h3>Better Performance</h3>
+            <p>Enjoy optimized performance and exclusive features</p>
+          </div>
+        </div>
+
+        <div class="store-buttons">
+          <a href="#" class="store-button ios" id="iosStoreButton">
+            Download on App Store
+          </a>
+          <a href="#" class="store-button android" id="androidStoreButton">
+            Get it on Play Store
+          </a>
+        </div>
+
+        <div class="divider">
+          <span>or</span>
+        </div>
+
+        <div class="qr-section">
+          <h2>Scan to Download</h2>
+          <p>Use your phone's camera to scan the QR code</p>
+          <div class="qr-code" id="qrCode">
+            <!-- QR code will be generated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('iosStoreButton').href =
+        process.env.IOS_APP_STORE_URL;
+      document.getElementById('androidStoreButton').href =
+        process.env.ANDROID_PLAY_STORE_URL;
+    </script>
+  </body>
+</html>
