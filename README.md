@@ -1,108 +1,215 @@
-# Universal Deep Linking Solution
+# Dynamic Deep Linking Service
 
-This server handles universal links, app links, and proper fallback behavior for both platforms.
+A robust and secure deep linking service that handles universal links (iOS), app links (Android), and provides a seamless web fallback experience.
 
 ## Features
 
-- Universal Links support for iOS
-- App Links support for Android
-- Smart app banner for iOS
-- Automatic app store redirection
-- Fallback web experience
-- QR code support for easy sharing
-- Configurable for multiple environments
+### Core Functionality
+
+- ✨ Universal Links support for iOS
+- 🤖 App Links support for Android
+- 🌐 Smart web fallback experience
+- 📱 Intelligent device detection
+- 🔄 Automatic app store redirection
+- 🔗 Custom URL scheme support
+
+### Security & Performance
+
+- 🛡️ Rate limiting protection
+- 🍪 Secure cookie handling
+- 🔒 Input validation and sanitization
+- 📊 MongoDB indexing for performance
+- 🧹 Automated cleanup of old records
+
+### Analytics & Tracking
+
+- 📈 Referral tracking system
+- 📊 Conversion analytics
+- 📱 Device and platform analytics
+- 🔍 Campaign tracking
+- 📉 Performance monitoring
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
+- MongoDB (v4.4 or higher)
 - SSL certificate (required for Universal Links)
 - Apple Developer Account (for iOS Universal Links)
 - Google Play Console Account (for Android App Links)
 
-## Setup
+## Installation
 
-1. Install dependencies:
+1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+   cd dynamic-linking
+   ```
+
+2. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Configure environment variables:
+3. Configure environment variables:
 
-   - Copy `.env.example` to `.env`
-   - Update the following variables:
-     - `IOS_APP_STORE_URL`: Your App Store URL
-     - `ANDROID_PLAY_STORE_URL`: Your Play Store URL
-     - `IOS_APP_SCHEME`: Your iOS app scheme
-     - `ANDROID_APP_SCHEME`: Your Android app scheme
-     - `IOS_BUNDLE_ID`: Your iOS bundle ID
-     - `ANDROID_PACKAGE_NAME`: Your Android package name
+   ```bash
+   cp .env.example .env
+   ```
 
-3. Configure Universal Links:
+   Update the following variables in `.env`:
 
-   - Update the `apple-app-site-association` file with your Team ID and bundle ID
-   - Host the file at `/.well-known/apple-app-site-association`
-   - Ensure it's served with `Content-Type: application/json`
+   ```env
+   # App Configuration
+   PORT=3000
 
-4. Configure Android App Links:
-   - Generate Digital Asset Links file
-   - Host at `/.well-known/assetlinks.json`
+   # Database
+   MONGODB_URI=mongodb://your-mongodb-uri
+
+   # App Links
+   IOS_APP_STORE_URL=https://apps.apple.com/YOUR_APP_ID
+   ANDROID_PLAY_STORE_URL=https://play.google.com/store/apps/details?id=YOUR_APP_PACKAGE
+   IOS_APP_SCHEME=yourapp://
+   ANDROID_APP_SCHEME=yourapp://
+
+   # App Bundle IDs
+   IOS_BUNDLE_ID=com.yourapp.ios
+   ANDROID_PACKAGE_NAME=com.yourapp.android
+
+   # Minimum App Versions
+   IOS_MIN_VERSION=1.0.0
+   ANDROID_MIN_VERSION=1.0.0
+   ```
 
 ## Usage
 
-1. Start the server:
+### Starting the Server
 
-   ```bash
-   npm start
+Development mode with auto-reload:
+
+```bash
+npm run dev
+```
+
+Production mode:
+
+```bash
+npm start
+```
+
+### Health Checks
+
+- Liveness probe: `GET /health/live`
+- Readiness probe: `GET /health/ready`
+
+### API Endpoints
+
+#### Deep Linking
+
+- `GET /:path(*)`
+  - Handles deep linking requests
+  - Supports referral parameters
+  - Performs device detection
+  - Returns appropriate redirect
+
+#### Referral API
+
+- `POST /api/verify-referral`
+
+  ```json
+  {
+    "clickId": "uuid-of-click"
+  }
+  ```
+
+- `GET /api/referral-stats`
+  - Returns referral performance metrics
+
+### Configuration Files
+
+1. iOS Universal Links (`/.well-known/apple-app-site-association`):
+
+   ```json
+   {
+     "applinks": {
+       "apps": [],
+       "details": [
+         {
+           "appID": "TEAM_ID.com.yourapp.ios",
+           "paths": ["*"]
+         }
+       ]
+     }
+   }
    ```
 
-2. Access your deep links:
-   ```
-   https://yourdomain.com/[path]?[parameters]
-   ```
-
-## Deep Link Structure
-
-- Format: `yourdomain.com/[path]?[parameters]`
-- Example: `yourdomain.com/profile/123?ref=share`
-
-The server will:
-
-1. Detect the user's device
-2. Attempt to open the app if installed
-3. Redirect to appropriate store if not installed
-4. Show web fallback if on desktop
-
-## iOS Setup
-
-1. Enable Associated Domains in your app
-2. Add capability in Xcode
-3. Add domain to Associated Domains:
-   ```
-   applinks:yourdomain.com
+2. Android App Links (`/.well-known/assetlinks.json`):
+   ```json
+   [
+     {
+       "relation": ["delegate_permission/common.handle_all_urls"],
+       "target": {
+         "namespace": "android_app",
+         "package_name": "com.yourapp.android",
+         "sha256_cert_fingerprints": ["YOUR_APP_FINGERPRINT"]
+       }
+     }
+   ]
    ```
 
-## Android Setup
+## Security Considerations
 
-1. Add App Links verification in Android Manifest
-2. Implement intent filters
-3. Verify domain ownership in Play Console
+1. Rate Limiting
 
-## Security
+   - 100 requests per 15 minutes per IP
+   - Configurable in `config/environment.js`
 
-- Always use HTTPS
-- Validate deep link parameters
-- Implement rate limiting
-- Consider authentication for sensitive deep links
+2. Data Protection
 
-## Testing
+   - Secure cookie settings
+   - HTTPS required for production
+   - Input validation on all endpoints
 
-Test your deep links using:
+3. Database Security
+   - Automatic cleanup of old records
+   - Indexed collections for performance
+   - Connection pooling and retry logic
 
-- iOS Universal Links Validator
-- Android App Links Assistant
-- Various devices and OS versions
-- Different browsers and apps
+## Monitoring
+
+The service includes:
+
+- Health check endpoints
+- MongoDB connection monitoring
+- Error tracking and logging
+- Performance metrics
+- Referral analytics
+
+## Development
+
+### Project Structure
+
+```
+project/
+├── src/
+│   ├── config/         # Configuration files
+│   ├── middleware/     # Custom middleware
+│   ├── models/         # Database models
+│   ├── routes/         # Route handlers
+│   ├── services/       # Business logic
+│   ├── utils/          # Utility functions
+│   └── app.js         # Express app setup
+├── public/            # Static files
+└── server.js         # Entry point
+```
+
+### Adding New Features
+
+1. Create new routes in `src/routes/`
+2. Add business logic in `src/services/`
+3. Create models in `src/models/`
+4. Update configuration in `src/config/`
 
 ## Contributing
 
@@ -115,3 +222,7 @@ Test your deep links using:
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please open an issue in the repository or contact the development team.
