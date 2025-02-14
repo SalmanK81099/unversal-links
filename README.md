@@ -98,33 +98,241 @@ Production mode:
 npm start
 ```
 
-### Health Checks
+### API Documentation
 
-- Liveness probe: `GET /health/live`
-- Readiness probe: `GET /health/ready`
+#### 1. Deep Linking
 
-### API Endpoints
+- **Base URL**: `https://your-domain.com`
 
-#### Deep Linking
+##### Create Deep Link
 
-- `GET /:path(*)`
-  - Handles deep linking requests
-  - Supports referral parameters
-  - Performs device detection
-  - Returns appropriate redirect
+```
+GET /:path
+```
 
-#### Referral API
+Query Parameters:
 
-- `POST /api/verify-referral`
+- `ref` or `referral`: Referral code
+- `source`: Traffic source
+- `utm_campaign`: Campaign name
 
-  ```json
-  {
+Example:
+
+```
+https://your-domain.com/product/123?ref=USER123&source=email&utm_campaign=summer_sale
+```
+
+#### 2. Referral API
+
+##### Verify Referral
+
+```http
+POST /api/verify-referral
+Content-Type: application/json
+
+{
     "clickId": "uuid-of-click"
-  }
-  ```
+}
+```
 
-- `GET /api/referral-stats`
-  - Returns referral performance metrics
+Response:
+
+```json
+{
+  "success": true,
+  "referralCode": "USER123",
+  "source": "email",
+  "campaign": "summer_sale"
+}
+```
+
+##### Get Referral Statistics
+
+```http
+GET /api/referral-stats
+```
+
+Response:
+
+```json
+[
+  {
+    "referralCode": "USER123",
+    "totalClicks": 150,
+    "conversions": 45,
+    "conversionRate": 30,
+    "sources": ["email", "social"],
+    "campaigns": ["summer_sale"]
+  }
+]
+```
+
+#### 3. Health Checks
+
+##### Liveness Probe
+
+```http
+GET /health/live
+```
+
+Response:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-03-21T12:00:00.000Z",
+  "service": "deep-linking"
+}
+```
+
+##### Readiness Probe
+
+```http
+GET /health/ready
+```
+
+Response:
+
+```json
+{
+  "status": "ready",
+  "timestamp": "2024-03-21T12:00:00.000Z",
+  "checks": {
+    "database": "connected"
+  }
+}
+```
+
+### React Native Integration
+
+#### 1. Installation
+
+```bash
+npx create-expo-app your-app
+cd your-app
+npx expo install expo-linking expo-application @react-native-async-storage/async-storage
+```
+
+#### 2. App Configuration (app.json)
+
+```json
+{
+  "expo": {
+    "name": "Your App",
+    "scheme": "yourapp",
+    "ios": {
+      "bundleIdentifier": "com.yourapp.ios",
+      "associatedDomains": ["applinks:your-domain.com"]
+    },
+    "android": {
+      "package": "com.yourapp.android",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "your-domain.com",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    }
+  }
+}
+```
+
+#### 3. Deep Link Handler Implementation
+
+```javascript
+// App.js
+import { useEffect } from 'react';
+import { Linking } from 'react-native';
+import * as ExpoLinking from 'expo-linking';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export default function App() {
+  useEffect(() => {
+    // Handle deep links when app is not running
+    const subscription = ExpoLinking.addEventListener('url', handleDeepLink);
+
+    // Check for initial URL
+    checkInitialURL();
+
+    // Check if first launch
+    checkFirstLaunch();
+
+    return () => subscription.remove();
+  }, []);
+
+  const checkInitialURL = async () => {
+    const initialUrl = await ExpoLinking.getInitialURL();
+    if (initialUrl) {
+      handleDeepLink({ url: initialUrl });
+    }
+  };
+
+  const handleDeepLink = ({ url }) => {
+    if (!url) return;
+
+    const { path, queryParams } = ExpoLinking.parse(url);
+
+    // Handle the deep link
+    console.log('Path:', path);
+    console.log('Query params:', queryParams);
+
+    // Example: Verify referral
+    if (queryParams.ref) {
+      verifyReferral(queryParams.ref);
+    }
+  };
+
+  const verifyReferral = async (clickId) => {
+    try {
+      const response = await fetch('https://your-domain.com/api/verify-referral', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ clickId }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        // Handle successful referral
+        console.log('Referral verified:', data);
+      }
+    } catch (error) {
+      console.error('Error verifying referral:', error);
+    }
+  };
+
+  return (
+    // Your app components
+  );
+}
+```
+
+#### 4. Testing Deep Links
+
+iOS Simulator:
+
+```bash
+xcrun simctl openurl booted "yourapp://path?ref=REFERRAL_CODE"
+# or
+xcrun simctl openurl booted "https://your-domain.com/path?ref=REFERRAL_CODE"
+```
+
+Android Emulator:
+
+```bash
+adb shell am start -W -a android.intent.action.VIEW -d "yourapp://path?ref=REFERRAL_CODE" com.yourapp.android
+# or
+adb shell am start -W -a android.intent.action.VIEW -d "https://your-domain.com/path?ref=REFERRAL_CODE" com.yourapp.android
+```
 
 ### Configuration Files
 
